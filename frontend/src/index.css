@@ -1,3 +1,184 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Custom Cyberpunk Theme Colors */
+:root {
+  --cyber-bg: #0a0a0a;
+  --cyber-surface: #1a1a2e;
+  --cyber-primary: #00ffff;
+  --cyber-secondary: #ff00ff;
+  --cyber-accent: #00ff88;
+  --cyber-error: #ff4444;
+  --cyber-text: #e0e0e0;
+  --cyber-text-secondary: #a0a0a0;
+}
+
+/* Light mode overrides */
+[data-theme="light"] {
+  --cyber-bg: #f0f0f0;
+  --cyber-surface: #ffffff;
+  --cyber-primary: #0077ff;
+  --cyber-secondary: #ff00cc;
+  --cyber-accent: #00cc88;
+  --cyber-error: #cc4444;
+  --cyber-text: #222222;
+  --cyber-text-secondary: #555555;
+}
+
+/* Background and text colors */
+.bg-cyber-bg {
+  background-color: var(--cyber-bg);
+}
+
+.bg-cyber-surface {
+  background-color: var(--cyber-surface);
+}
+
+.text-cyber-text {
+  color: var(--cyber-text);
+}
+
+.text-cyber-text-secondary {
+  color: var(--cyber-text-secondary);
+}
+
+/* Borders */
+.border-cyber-primary {
+  border-color: var(--cyber-primary);
+}
+
+.border-cyber-secondary {
+  border-color: var(--cyber-secondary);
+}
+
+.border-cyber-accent {
+  border-color: var(--cyber-accent);
+}
+
+.border-cyber-error {
+  border-color: var(--cyber-error);
+}
+
+/* Text colors */
+.text-cyber-primary {
+  color: var(--cyber-primary);
+}
+
+.text-cyber-accent {
+  color: var(--cyber-accent);
+}
+
+/* Font families */
+.font-cyber-header {
+  font-family: 'Orbitron', monospace;
+}
+
+.font-cyber-body {
+  font-family: 'Roboto Mono', monospace;
+}
+
+/* Shadows */
+.shadow-cyber-glow {
+  box-shadow: 0 0 10px var(--cyber-primary);
+}
+
+.shadow-cyber-glow-intense {
+  box-shadow: 0 0 20px var(--cyber-primary);
+}
+
+.shadow-cyber-electric {
+  box-shadow: 0 0 15px var(--cyber-accent);
+}
+
+/* Animations */
+@keyframes cyber-pulse {
+  0%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 10px var(--cyber-primary), 0 0 20px var(--cyber-primary);
+  }
+  50% {
+    opacity: 0.7;
+    text-shadow: none;
+  }
+}
+
+.animate-cyber-pulse {
+  animation: cyber-pulse 2s ease-in-out infinite;
+}
+
+@keyframes cyber-scan {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+.animate-cyber-scan {
+  background: linear-gradient(90deg, transparent, var(--cyber-primary), transparent);
+  background-size: 200% 100%;
+  animation: cyber-scan 3s linear infinite;
+}
+
+/* Particle animations */
+@keyframes cyber-particle-odd {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes cyber-particle-even {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+}
+
+.animate-cyber-particle-odd {
+  animation: cyber-particle-odd 4s ease-in-out infinite;
+}
+
+.animate-cyber-particle-even {
+  animation: cyber-particle-even 4s ease-in-out infinite;
+}
+
+/* Status animations */
+@keyframes cyber-status {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 5px var(--cyber-accent);
+  }
+  50% {
+    opacity: 0.5;
+    box-shadow: none;
+  }
+}
+
+.animate-cyber-status {
+  animation: cyber-status 2s ease-in-out infinite;
+}
+
+/* Backdrop blur */
+.backdrop-blur-cyber {
+  backdrop-filter: blur(10px);
+}
+
+/* Additional utility classes */
+.rounded-2xl {
+  border-radius: 1rem;
+}
+
+.transition-all {
+  transition-property: all;
+  transition-duration: 300ms;
+  transition-timing-function: ease-in-out;
+}
+
+.pointer-events-none {
+  pointer-events: none;
+}
