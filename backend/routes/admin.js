@@ -132,6 +132,122 @@ router.post('/activity', async (req, res) => {
   }
 });
 
+// Get all data/files with pagination and filtering
+router.get('/data', async (req, res) => {
+  try {
+    const { page = 1, limit = 20, search = '', user = '', sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
+
+    const query = {};
+    if (search) {
+      query.$or = [
+        { filename: { $regex: search, $options: 'i' } },
+        { originalName: { $regex: search, $options: 'i' } }
+      ];
+    }
+    if (user) {
+      query.user = user;
+    }
+
+    const sortOptions = {};
+    sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
+
+    const data = await Data.find(query)
+      .populate('user', 'username email')
+      .sort(sortOptions)
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await Data.countDocuments(query);
+
+    res.json({
+      data,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: parseInt(limit)
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get specific data entry
+router.get('/data/:id', async (req, res) => {
+  try {
+    const data = await Data.findById(req.params.id).populate('user', 'username email');
+    if (!data) {
+      return res.status(404).json({ message: 'Data not found' });
+    }
+    res.json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update data entry
+router.put('/data/:id', async (req, res) => {
+  try {
+    const { data: dataContent, headers, description, tags, isPublic } = req.body;
+
+    const dataEntry = await Data.findById(req.params.id);
+    if (!dataEntry) {
+      return res.status(404).json({ message: 'Data not found' });
+    }
+
+    if (dataContent) dataEntry.data = dataContent;
+    if (headers) dataEntry.headers = headers;
+    if (description !== undefined) dataEntry.description = description;
+    if (tags) dataEntry.tags = tags;
+    if (typeof isPublic === 'boolean') dataEntry.isPublic = isPublic;
+
+    await dataEntry.save();
+
+    // Log the activity
+    const log = new ActivityLog({
+      user: req.user.id,
+      action: 'modified_data',
+      details: `Modified data entry: ${dataEntry.filename}`,
+      ip: req.ip
+    });
+    await log.save();
+
+    res.json({ message: 'Data updated successfully', data: dataEntry });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete data entry
+router.delete('/data/:id', async (req, res) => {
+  try {
+    const dataEntry = await Data.findById(req.params.id);
+    if (!dataEntry) {
+      return res.status(404).json({ message: 'Data not found' });
+    }
+
+    await dataEntry.remove();
+
+    // Log the activity
+    const log = new ActivityLog({
+      user: req.user.id,
+      action: 'deleted_data',
+      details: `Deleted data entry: ${dataEntry.filename}`,
+      ip: req.ip
+    });
+    await log.save();
+
+    res.json({ message: 'Data deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Get analytics data
 router.get('/analytics', async (req, res) => {
   try {
@@ -140,13 +256,17 @@ router.get('/analytics', async (req, res) => {
     const adminUsers = await User.countDocuments({ role: 'admin' });
     const totalUploads = await Data.countDocuments();
     const recentUploads = await Data.countDocuments({ createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } }); // Last 30 days
+    const publicFiles = await Data.countDocuments({ isPublic: true });
+    const totalFileSize = await Data.aggregate([{ $group: { _id: null, total: { $sum: '$fileSize' } } }]);
 
     res.json({
       totalUsers,
       activeUsers,
       adminUsers,
       totalUploads,
-      recentUploads
+      recentUploads,
+      publicFiles,
+      totalFileSize: totalFileSize[0]?.total || 0
     });
   } catch (error) {
     console.error(error);

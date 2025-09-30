@@ -3,11 +3,25 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 
+// Custom hook to detect mobile
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return isMobile;
+};
+
 // Mock data removed, using API data instead
 
 const AdminPanel = () => {
   const { t } = useTranslation();
   const { isDarkMode } = useTheme();
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState('users');
   const [expandedUser, setExpandedUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,6 +32,8 @@ const AdminPanel = () => {
   const [users, setUsers] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
   const [analytics, setAnalytics] = useState({});
+  const [files, setFiles] = useState([]);
+  const [filesPagination, setFilesPagination] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -152,6 +168,7 @@ const AdminPanel = () => {
   const tabs = [
     { id: 'users', label: t('Users'), icon: '👥' },
     { id: 'activity', label: t('Activity Logs'), icon: '📋' },
+    { id: 'files', label: t('Files'), icon: '📁' },
     { id: 'analytics', label: t('Analytics'), icon: '📈' }
   ];
 
@@ -174,31 +191,58 @@ const AdminPanel = () => {
       </motion.div>
 
       {/* Tab Navigation */}
-      <motion.div
-        className={`flex space-x-1 p-1 rounded-xl ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}
-        variants={itemVariants}
-      >
-        {tabs.map((tab) => (
-          <motion.button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-              activeTab === tab.id
-                ? isDarkMode
-                  ? 'bg-gray-700 text-white shadow-lg'
-                  : 'bg-white text-gray-900 shadow-lg'
-                : isDarkMode
-                  ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-            }`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span>{tab.icon}</span>
-            <span>{tab.label}</span>
-          </motion.button>
-        ))}
-      </motion.div>
+      {isMobile ? (
+        <motion.div
+          className={`fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center py-2 px-4 ${isDarkMode ? 'bg-gray-800 border-t border-gray-700' : 'bg-white border-t border-gray-200'} shadow-lg`}
+          variants={itemVariants}
+        >
+          {tabs.map((tab) => (
+            <motion.button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex flex-col items-center space-y-1 p-2 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === tab.id
+                  ? isDarkMode
+                    ? 'text-white bg-gray-700'
+                    : 'text-gray-900 bg-gray-100'
+                  : isDarkMode
+                    ? 'text-gray-400 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+              }`}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className="text-lg">{tab.icon}</span>
+              <span className="text-xs">{tab.label}</span>
+            </motion.button>
+          ))}
+        </motion.div>
+      ) : (
+        <motion.div
+          className={`flex space-x-1 p-1 rounded-xl ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}
+          variants={itemVariants}
+        >
+          {tabs.map((tab) => (
+            <motion.button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === tab.id
+                  ? isDarkMode
+                    ? 'bg-gray-700 text-white shadow-lg'
+                    : 'bg-white text-gray-900 shadow-lg'
+                  : isDarkMode
+                    ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span>{tab.icon}</span>
+              <span>{tab.label}</span>
+            </motion.button>
+          ))}
+        </motion.div>
+      )}
 
       {/* Users Tab */}
       <AnimatePresence mode="wait">
@@ -436,6 +480,218 @@ const AdminPanel = () => {
                 ))}
               </div>
             </motion.div>
+          </motion.div>
+        )}
+
+        {/* Files Tab */}
+        {activeTab === 'files' && (
+          <motion.div
+            key="files"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
+            {/* Files Header */}
+            <motion.div
+              className={`p-6 rounded-xl ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-lg`}
+              variants={itemVariants}
+            >
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">{t('File Management')}</h3>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {t('Manage all uploaded files and data')}
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {filesPagination.totalItems || 0} {t('Files')}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Files List */}
+            <div className="space-y-4">
+              {files.map((file, index) => (
+                <motion.div
+                  key={file._id}
+                  className={`p-6 rounded-xl ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-lg`}
+                  variants={itemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  custom={index}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+                        }`}>
+                          📄
+                        </div>
+                        <div>
+                          <h4 className="font-semibold">{file.filename || file.originalName}</h4>
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            {t('Uploaded by')}: {file.user?.username || 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            {t('Size')}:
+                          </span>
+                          <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                            {file.fileSize ? `${(file.fileSize / 1024).toFixed(1)} KB` : 'N/A'}
+                          </p>
+                        </div>
+                        <div>
+                          <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            {t('Type')}:
+                          </span>
+                          <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                            {file.fileType || 'Unknown'}
+                          </p>
+                        </div>
+                        <div>
+                          <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            {t('Upload Date')}:
+                          </span>
+                          <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                            {new Date(file.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div>
+                          <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            {t('Status')}:
+                          </span>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            file.isPublic
+                              ? (isDarkMode ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800')
+                              : (isDarkMode ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-800')
+                          }`}>
+                            {file.isPublic ? t('Public') : t('Private')}
+                          </span>
+                        </div>
+                      </div>
+
+                      {file.description && (
+                        <div className="mt-3">
+                          <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            {t('Description')}:
+                          </span>
+                          <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            {file.description}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col space-y-2 ml-4">
+                      <motion.button
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          isDarkMode
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                        }`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {t('View Data')}
+                      </motion.button>
+                      <motion.button
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          isDarkMode
+                            ? 'bg-green-600 hover:bg-green-700 text-white'
+                            : 'bg-green-500 hover:bg-green-600 text-white'
+                        }`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {t('Edit')}
+                      </motion.button>
+                      <motion.button
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          isDarkMode
+                            ? 'bg-red-600 hover:bg-red-700 text-white'
+                            : 'bg-red-500 hover:bg-red-600 text-white'
+                        }`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {t('Delete')}
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+
+              {files.length === 0 && !loading && (
+                <motion.div
+                  className={`p-12 text-center rounded-xl ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-lg`}
+                  variants={itemVariants}
+                >
+                  <div className="text-6xl mb-4">📁</div>
+                  <h3 className="text-xl font-semibold mb-2">{t('No Files Found')}</h3>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {t('No files have been uploaded yet.')}
+                  </p>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Pagination */}
+            {filesPagination.totalPages > 1 && (
+              <motion.div
+                className={`p-4 rounded-xl ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-lg`}
+                variants={itemVariants}
+              >
+                <div className="flex items-center justify-between">
+                  <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {t('Showing')} {((filesPagination.currentPage - 1) * filesPagination.itemsPerPage) + 1} {t('to')}{' '}
+                    {Math.min(filesPagination.currentPage * filesPagination.itemsPerPage, filesPagination.totalItems)} {t('of')}{' '}
+                    {filesPagination.totalItems} {t('files')}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      disabled={filesPagination.currentPage === 1}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        filesPagination.currentPage === 1
+                          ? (isDarkMode ? 'bg-gray-700 text-gray-500' : 'bg-gray-200 text-gray-400')
+                          : (isDarkMode
+                              ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                              : 'bg-blue-500 hover:bg-blue-600 text-white')
+                      }`}
+                      onClick={() => {/* Handle previous page */}}
+                    >
+                      {t('Previous')}
+                    </button>
+                    <span className={`px-3 py-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {filesPagination.currentPage} / {filesPagination.totalPages}
+                    </span>
+                    <button
+                      disabled={filesPagination.currentPage === filesPagination.totalPages}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        filesPagination.currentPage === filesPagination.totalPages
+                          ? (isDarkMode ? 'bg-gray-700 text-gray-500' : 'bg-gray-200 text-gray-400')
+                          : (isDarkMode
+                              ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                              : 'bg-blue-500 hover:bg-blue-600 text-white')
+                      }`}
+                      onClick={() => {/* Handle next page */}}
+                    >
+                      {t('Next')}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         )}
 

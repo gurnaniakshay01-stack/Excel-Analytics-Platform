@@ -280,30 +280,30 @@ const ChartDisplay = () => {
 
   return (
     <motion.div
-      className={`space-y-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+      className={`space-y-6 sm:space-y-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
-      {/* Header */}
+      {/* Header - MOBILE RESPONSIVE */}
       <motion.div
-        className="text-center"
+        className="text-center px-4"
         variants={itemVariants}
       >
-        <h2 className="text-3xl font-bold mb-2">{t('Interactive Chart Display')}</h2>
-        <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-2">{t('Interactive Chart Display')}</h2>
+        <p className={`text-base sm:text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
           {t('Visualize your data with interactive charts and export options')}
         </p>
       </motion.div>
 
-      {/* Chart Type Info */}
+      {/* Chart Type Info - MOBILE RESPONSIVE */}
       <motion.div
         className={`p-4 rounded-xl ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-lg`}
         variants={itemVariants}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div className={`px-3 py-1 rounded-full text-sm font-medium self-start sm:self-auto ${
               chartType === '3d'
                 ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
                 : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
@@ -315,12 +315,12 @@ const ChartDisplay = () => {
             </span>
           </div>
 
-          {/* Export Buttons */}
-          <div className="flex items-center space-x-3">
+          {/* Export Buttons - MOBILE RESPONSIVE */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <motion.button
               onClick={exportToPNG}
               disabled={isExporting}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              className={`flex items-center justify-center space-x-2 px-4 py-3 sm:py-2 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base touch-manipulation ${
                 isDarkMode
                   ? 'bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-600'
                   : 'bg-blue-500 hover:bg-blue-600 text-white disabled:bg-gray-400'
@@ -329,16 +329,16 @@ const ChartDisplay = () => {
               whileTap={{ scale: 0.95 }}
               variants={itemVariants}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span>{isExporting ? t('Exporting...') : t('PNG')}</span>
+              <span>{isExporting ? t('Exporting...') : t('Export PNG')}</span>
             </motion.button>
 
             <motion.button
               onClick={exportToPDF}
               disabled={isExporting}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              className={`flex items-center justify-center space-x-2 px-4 py-3 sm:py-2 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base touch-manipulation ${
                 isDarkMode
                   ? 'bg-green-600 hover:bg-green-700 text-white disabled:bg-gray-600'
                   : 'bg-green-500 hover:bg-green-600 text-white disabled:bg-gray-400'
@@ -347,7 +347,7 @@ const ChartDisplay = () => {
               whileTap={{ scale: 0.95 }}
               variants={itemVariants}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               <span>{isExporting ? t('Exporting...') : t('PDF (Disabled)')}</span>
@@ -356,13 +356,13 @@ const ChartDisplay = () => {
         </div>
       </motion.div>
 
-      {/* Chart Container */}
+      {/* Chart Container - MOBILE RESPONSIVE */}
       <motion.div
         className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl shadow-lg overflow-hidden`}
         variants={itemVariants}
-        style={{ height: '500px' }}
+        style={{ height: window.innerWidth < 640 ? '350px' : '500px' }}
       >
-        <div className="p-6 h-full">
+        <div className="p-4 sm:p-6 h-full">
           {show3D ? (
             <ThreeDChart data={data} xAxis={xAxis} yAxis={yAxis} />
           ) : (
@@ -371,12 +371,12 @@ const ChartDisplay = () => {
         </div>
       </motion.div>
 
-      {/* Chart Info */}
+      {/* Chart Info - MOBILE RESPONSIVE */}
       <motion.div
         className={`p-4 rounded-xl ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-lg`}
         variants={itemVariants}
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
           <div>
             <div className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
               {data.length - 1}

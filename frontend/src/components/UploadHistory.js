@@ -134,50 +134,50 @@ const UploadHistory = () => {
 
   return (
     <motion.div
-      className={`space-y-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+      className={`space-y-6 sm:space-y-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
       {/* Header */}
       <motion.div
-        className="text-center"
+        className="text-center px-4"
         variants={itemVariants}
       >
-        <h2 className="text-3xl font-bold mb-2">{t('Upload History')}</h2>
-        <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-2">{t('Upload History')}</h2>
+        <p className={`text-base sm:text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
           {t('Track and manage your uploaded files')}
         </p>
       </motion.div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Stats Cards - MOBILE RESPONSIVE */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
         {[
-          { label: t('Total Files'), value: mockHistory.length, color: 'blue' },
-          { label: t('Processed'), value: mockHistory.filter(f => f.status === 'processed').length, color: 'green' },
-          { label: t('Processing'), value: mockHistory.filter(f => f.status === 'processing').length, color: 'yellow' },
-          { label: t('Failed'), value: mockHistory.filter(f => f.status === 'failed').length, color: 'red' }
+          { label: t('Total Files'), value: history.length, color: 'blue' },
+          { label: t('Processed'), value: history.filter(f => f.status === 'processed').length, color: 'green' },
+          { label: t('Processing'), value: history.filter(f => f.status === 'processing').length, color: 'yellow' },
+          { label: t('Failed'), value: history.filter(f => f.status === 'failed').length, color: 'red' }
         ].map((stat, index) => (
           <motion.div
             key={stat.label}
-            className={`p-6 rounded-xl ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-lg`}
+            className={`p-4 sm:p-6 rounded-xl ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-lg`}
             variants={itemVariants}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            <div className={`text-3xl font-bold mb-2 text-${stat.color}-500`}>
+            <div className={`text-2xl sm:text-3xl font-bold mb-2 text-${stat.color}-500`}>
               {stat.value}
             </div>
-            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <div className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               {stat.label}
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* History Table */}
+      {/* History Table - DESKTOP */}
       <motion.div
-        className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl shadow-lg overflow-hidden`}
+        className={`hidden md:block ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl shadow-lg overflow-hidden`}
         variants={itemVariants}
       >
         <div className="overflow-x-auto">
@@ -306,8 +306,97 @@ const UploadHistory = () => {
         </div>
       </motion.div>
 
+      {/* History Cards - MOBILE */}
+      <div className="md:hidden space-y-4">
+        <AnimatePresence>
+          {sortedHistory.map((item, index) => (
+            <motion.div
+              key={item.id}
+              className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-xl shadow-lg overflow-hidden`}
+              variants={tableRowVariants}
+              initial="hidden"
+              animate="visible"
+              whileHover="hover"
+              custom={index}
+              onClick={() => setSelectedRow(selectedRow === item.id ? null : item.id)}
+            >
+              <div className="p-4">
+                {/* Card Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+                    }`}>
+                      📄
+                    </div>
+                    <div>
+                      <h3 className={`font-medium text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {item.filename}
+                      </h3>
+                      <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {item.uploadedAt}
+                      </p>
+                    </div>
+                  </div>
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
+                    <span className="mr-1">{getStatusIcon(item.status)}</span>
+                    {t(item.status.charAt(0).toUpperCase() + item.status.slice(1))}
+                  </span>
+                </div>
+
+                {/* Card Details */}
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <p className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {t('Size')}
+                    </p>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                      {item.size}
+                    </p>
+                  </div>
+                  <div>
+                    <p className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {t('Details')}
+                    </p>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                      {item.rows > 0 ? `${item.rows} rows, ${item.columns} cols` : t('N/A')}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Card Actions */}
+                <div className="flex space-x-2">
+                  <motion.button
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors touch-manipulation ${
+                      isDarkMode
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                    }`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {t('View')}
+                  </motion.button>
+                  <motion.button
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors touch-manipulation ${
+                      isDarkMode
+                        ? 'bg-red-600 hover:bg-red-700 text-white'
+                        : 'bg-red-500 hover:bg-red-600 text-white'
+                    }`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {t('Delete')}
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
       {/* Empty State */}
-      {mockHistory.length === 0 && (
+      {history.length === 0 && (
         <motion.div
           className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}
           initial={{ opacity: 0, y: 20 }}
