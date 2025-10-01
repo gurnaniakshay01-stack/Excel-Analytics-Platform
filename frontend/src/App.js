@@ -247,7 +247,7 @@ function App() {
             {/* 🚀 CYBERPUNK CONTROLS - MOBILE OPTIMIZED */}
             <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-4 flex-shrink-0">
               {/* Mobile Menu Button - Only on mobile */}
-              <button
+              {/* <button
                 onClick={toggleMobileMenu}
                 className="md:hidden p-1.5 sm:p-2 rounded-lg bg-cyber-surface/60 hover:bg-cyber-surface/80 text-cyber-accent backdrop-blur-cyber border border-cyber-primary/30 hover:border-cyber-accent/50 transition-all duration-200 hover:scale-105 hover:shadow-cyber-glow"
                 title="Toggle Menu"
@@ -255,7 +255,7 @@ function App() {
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
-              </button>
+              </button> */}
 
               {/* Language Selector - Hidden on very small screens */}
               <select
@@ -269,7 +269,7 @@ function App() {
               </select>
 
               {/* Theme Toggle */}
-              <button
+              {/* <button
                 onClick={toggleTheme}
                 className="p-1.5 sm:p-2 lg:p-2.5 rounded-lg bg-cyber-surface/60 hover:bg-cyber-surface/80 text-cyber-accent backdrop-blur-cyber border border-cyber-primary/30 hover:border-cyber-accent/50 transition-all duration-200 hover:scale-105 hover:shadow-cyber-glow"
                 title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
@@ -283,7 +283,7 @@ function App() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                   </svg>
                 )}
-              </button>
+              </button> */}
 
               {/* User Menu - Simplified on mobile */}
               <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-3">
@@ -293,13 +293,13 @@ function App() {
                     {username}
                   </span>
                 </div>
-                <button
+                {/* <button
                   onClick={onLogout}
                   className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-cyber-error to-cyber-warning hover:from-cyber-warning hover:to-cyber-error text-cyber-text text-xs sm:text-sm rounded-lg font-cyber-body font-medium transition-all duration-200 hover:scale-105 shadow-cyber-glow hover:shadow-cyber-electric"
                 >
                   <span className="hidden sm:inline">{t('Logout')}</span>
                   <span className="sm:hidden">×</span>
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
